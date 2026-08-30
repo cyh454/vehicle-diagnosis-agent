@@ -1,0 +1,39 @@
+# docker-compose.yml
+services:
+  db:
+    # PG18 + pgvector（若该 tag 在你的环境不可用，可回退 pgvector/pgvector:pg17）
+    image: pgvector/pgvector:pg18
+    container_name: vda-db
+    environment:
+      POSTGRES_DB: vehicle_diagnosis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      # PG18+ 镜像要求数据卷挂载到 /var/lib/postgresql（数据存于带版本号的子目录）
+      - pgdata:/var/lib/postgresql
+      - ./init.sql:/docker-entrypoint-initdb.d/10-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vehicle_diagnosis"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    container_name: vda-app
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/vehicle_diagnosis
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:

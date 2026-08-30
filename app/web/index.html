@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>车载故障诊断助手</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2322d3ee'/%3E%3Cstop offset='1' stop-color='%233b82f6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M36 10 20 36h10l-4 18 18-28H33z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ══════════ 左侧边栏 ══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 17h14M6.5 17a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0zM21.1 17a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0z"/>
+          <path d="M4 17v-4.2c0-.6.2-1.2.5-1.7L7 6.5C7.4 5.6 8.3 5 9.3 5h5.4c1 0 1.9.6 2.3 1.5l2.5 4.6c.3.5.5 1.1.5 1.7V17"/>
+          <path d="M4.6 11h14.8"/>
+          <path d="M13.5 7.5 11 11h2.5l-1.8 3.5"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>车载故障诊断助手</h1>
+        <p>RAG 知识库 · 多工具编排 · 车辆记忆</p>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" id="newChatBtn" title="开始一次新的诊断">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      新建诊断会话
+    </button>
+
+    <div class="session-label">历史会话</div>
+    <nav class="session-list" id="sessionList" aria-label="历史会话列表">
+      <div class="session-empty" id="sessionEmpty">暂无历史会话</div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="status-dot" id="statusDot"></span>
+      <span class="status-text" id="statusText">连接检测中…</span>
+      <button class="icon-btn" id="themeToggle" title="切换明暗主题" aria-label="切换主题">
+        <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ══════════ 主聊天区 ══════════ -->
+  <main class="chat">
+    <header class="chat-header">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="打开侧栏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="header-info">
+        <h2 id="chatTitle">新的诊断会话</h2>
+        <p id="chatSubtitle">描述车辆故障现象，AI 将自动检索知识库、故障码与维修案例</p>
+      </div>
+      <div class="vehicle-chip hidden" id="vehicleChip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 16h14M6.6 16a1.7 1.7 0 1 1-3.4 0 1.7 1.7 0 0 1 3.4 0zM20.8 16a1.7 1.7 0 1 1-3.4 0 1.7 1.7 0 0 1 3.4 0z"/><path d="M4 16v-4l2.4-4.6C6.9 6.5 7.8 6 8.7 6h6.6c.9 0 1.8.5 2.3 1.4L20 12v4"/><path d="M4.5 12h15"/></svg>
+        <span id="vehicleText"></span>
+      </div>
+    </header>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <textarea id="input" rows="1" maxlength="4000"
+          placeholder="描述故障现象、故障码或 VIN，例如：2023款汉EV 仪表提示动力电池绝缘阻值低，如何排查？"></textarea>
+        <button class="send-btn" id="sendBtn" disabled aria-label="发送">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+        </button>
+      </div>
+      <p class="composer-hint">Enter 发送 · Shift + Enter 换行 · 诊断建议仅供参考，实操请遵守高压作业安全规范</p>
+    </div>
+  </main>
+
+  <!-- 移动端侧栏遮罩 -->
+  <div class="backdrop" id="backdrop"></div>
+</div>
+
+<script src="/app.js"></script>
+</body>
+</html>

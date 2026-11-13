@@ -91,17 +91,17 @@ python scripts/eval_test.py --base http://localhost:8000
 
 ## 📡 API 一览
 
-业务接口统一挂在 `/api/v1` 下：
+业务接口路径由三层拼成：`app/config.py` 的 `api_prefix`（默认 `/api/v1`）+ `app/api/routes/` 下各路由模块的 `APIRouter(prefix=...)` + 装饰器里的路径。完整清单以运行时的 `/docs` 为准：
 
 | 方法 | 路径 | 说明 |
 |---|---|---|
-| POST | `/api/v1/chat` | 诊断对话（核心接口） |
-| GET | `/api/v1/sessions` | 会话列表 |
-| GET | `/api/v1/sessions/{session_id}` | 会话消息详情 |
-| POST | `/api/v1/documents` | 上传知识文档 |
-| GET | `/api/v1/documents` | 文档列表 |
-| DELETE | `/api/v1/documents/{doc_id}` | 删除文档 |
-| POST | `/api/v1/search` | 知识库语义检索 |
+| POST | `/api/v1/diagnosis/chat` | 诊断对话（核心接口） |
+| GET | `/api/v1/diagnosis/sessions` | 会话列表 |
+| GET | `/api/v1/diagnosis/sessions/{session_id}` | 会话消息详情 |
+| POST | `/api/v1/knowledge/documents` | 上传知识文档 |
+| GET | `/api/v1/knowledge/documents` | 文档列表 |
+| DELETE | `/api/v1/knowledge/documents/{doc_id}` | 删除文档 |
+| POST | `/api/v1/knowledge/search` | 知识库语义检索 |
 | GET | `/api/v1/vehicles/{vin}` | 车辆档案与故障历史 |
 | GET | `/health` / `/metrics` | 健康检查 / 运行指标 |
 

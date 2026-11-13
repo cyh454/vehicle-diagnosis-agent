@@ -34,3 +34,6 @@ logs/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# WorkBuddy 本地工作数据（memory 日志等，不提交）
+.workbuddy/
